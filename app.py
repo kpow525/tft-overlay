@@ -19,7 +19,7 @@ RIOT_TAG_LINE = os.environ["RIOT_TAG_LINE"]
 
 REGION = "americas"
 
-DOUBLE_UP_QUEUE_ID = 1160
+DOUBLE_UP_QUEUE_ID = 1100
 
 HEADERS = {
     "X-Riot-Token": RIOT_API_KEY
@@ -52,7 +52,7 @@ def get_account():
     return riot_get(url)
 
 
-def get_match_ids(puuid, count=10):
+def get_match_ids(puuid, count=5):
     url = (
         f"https://{REGION}.api.riotgames.com"
         f"/tft/match/v1/matches/by-puuid/"
