@@ -78,7 +78,7 @@ def get_double_up_data(data):
     return{
         "tier": double_up["tier"],
         "rank": double_up["rank"],
-        "lp:": double_up["leaguePoints"],
+        "lp": double_up["leaguePoints"],
         "wins": double_up["wins"],
         "losses": double_up["losses"]
     }
@@ -204,7 +204,7 @@ def stats():
         ),
         "queue": "Double Up",
         "queue_id": DOUBLE_UP_QUEUE_ID,
-        **double_up_stats,
+        # **double_up_stats,
         **double_up_data,
     }
 
