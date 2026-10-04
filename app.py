@@ -9,8 +9,9 @@ RIOT_API_KEY = os.environ["RIOT_API_KEY"]
 RIOT_GAME_NAME = os.environ["RIOT_GAME_NAME"]
 RIOT_TAG_LINE = os.environ["RIOT_TAG_LINE"]
 
-ACCOUNT_REGION = "americas"
-TFT_REGION = "americas"
+REGION = "americas"
+
+DOUBLE_UP_QUEUE_ID = 1160
 
 HEADERS = {
     "X-Riot-Token": RIOT_API_KEY
@@ -33,59 +34,125 @@ def riot_get(url, params=None):
     return response.json()
 
 
+def get_account():
+    url = (
+        f"https://{REGION}.api.riotgames.com"
+        f"/riot/account/v1/accounts/by-riot-id/"
+        f"{RIOT_GAME_NAME}/{RIOT_TAG_LINE}"
+    )
+
+    return riot_get(url)
+
+
+def get_match_ids(puuid, count=100):
+    url = (
+        f"https://{REGION}.api.riotgames.com"
+        f"/tft/match/v1/matches/by-puuid/"
+        f"{puuid}/ids"
+    )
+
+    return riot_get(url, params={"count": count})
+
+
+def get_match(match_id):
+    url = (
+        f"https://{REGION}.api.riotgames.com"
+        f"/tft/match/v1/matches/{match_id}"
+    )
+
+    return riot_get(url)
+
+
+def get_double_up_stats(puuid, match_ids):
+    placements = []
+
+    double_up_matches = 0
+
+    for match_id in match_ids:
+        match = get_match(match_id)
+
+        info = match["info"]
+
+        if info.get("queue_id") != DOUBLE_UP_QUEUE_ID:
+            continue
+
+        double_up_matches += 1
+
+        for participant in info["participants"]:
+            if participant["puuid"] == puuid:
+                placements.append(participant["placement"])
+                break
+
+    if not placements:
+        return {
+            "games": 0,
+            "wins": 0,
+            "win_rate": 0,
+            "top2": 0,
+            "top2_rate": 0,
+            "average_placement": None,
+        }
+
+    games = len(placements)
+
+    wins = sum(
+        placement == 1
+        for placement in placements
+    )
+
+    top2 = sum(
+        placement <= 2
+        for placement in placements
+    )
+
+    return {
+        "games": games,
+        "wins": wins,
+        "win_rate": round(wins / games * 100, 2),
+        "top2": top2,
+        "top2_rate": round(top2 / games * 100, 2),
+        "average_placement": round(
+            sum(placements) / games,
+            2,
+        ),
+    }
+
+
 @app.route("/")
 def home():
     return "TFT Double Up Overlay is running."
 
 
-@app.route("/api/debug")
-def debug():
-    # Resolve Riot ID -> PUUID
-    account_url = (
-        f"https://{ACCOUNT_REGION}.api.riotgames.com"
-        f"/riot/account/v1/accounts/by-riot-id/"
-        f"{RIOT_GAME_NAME}/{RIOT_TAG_LINE}"
-    )
+@app.route("/api/stats")
+def stats():
+    account = get_account()
 
-    account = riot_get(account_url)
     puuid = account["puuid"]
 
-    # Get recent TFT matches
-    matches_url = (
-        f"https://{TFT_REGION}.api.riotgames.com"
-        f"/tft/match/v1/matches/by-puuid/"
-        f"{puuid}/ids"
+    match_ids = get_match_ids(
+        puuid,
+        count=100,
     )
 
-    match_ids = riot_get(
-        matches_url,
-        params={"count": 20}
+    double_up_stats = get_double_up_stats(
+        puuid,
+        match_ids,
     )
-
-    queue_ids = {}
-
-    for match_id in match_ids:
-        match_url = (
-            f"https://{TFT_REGION}.api.riotgames.com"
-            f"/tft/match/v1/matches/{match_id}"
-        )
-
-        match = riot_get(match_url)
-
-        queue_id = match["info"].get("queue_id")
-
-        queue_ids[str(queue_id)] = (
-            queue_ids.get(str(queue_id), 0) + 1
-        )
 
     return jsonify({
-        "riot_id": f"{account['gameName']}#{account['tagLine']}",
-        "puuid_found": bool(puuid),
-        "matches_found": len(match_ids),
-        "queue_ids": queue_ids,
+        "riot_id": (
+            f"{account['gameName']}#{account['tagLine']}"
+        ),
+        "queue": "Double Up",
+        "queue_id": DOUBLE_UP_QUEUE_ID,
+        **double_up_stats,
     })
 
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
-    app.run(host="0.0.0.0", port=port)
+
+    app.run(
+        host="0.0.0.0",
+        port=port,
+    )
