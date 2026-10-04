@@ -33,6 +33,28 @@
             font-weight: bold;
         }
 
+        .rank-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .rank-icon {
+            width: 70px;
+            height: 70px;
+            object-fit: contain;
+        }
+
+        .rank-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .lp {
+            font-size: 14px;
+            opacity: 0.75;
+        }
+
         #loading {
             opacity: 0.7;
         }
@@ -57,15 +79,20 @@
     </div>
 
     <div id="stats" style="display: none;">
-
+<!-- 
         <div class="stat">
             <div class="label">RANK</div>
             <div class="value" id="rank">-</div>
-        </div>
+        </div> -->
 
-        <div class="stat">
-            <div class="label">LP</div>
-            <div class="value" id="lp">-</div>
+        <div class="rank-container">
+            <img id="rank-icon" class="rank-icon" src="" alt="Rank">
+
+            <div class="rank-info">
+                <div class="label">RANK</div>
+                <div class="value" id="rank">-</div>
+                <div class="lp" id="lp">- LP</div>
+            </div>
         </div>
 
         <div class="stat">
@@ -96,12 +123,15 @@
 async function loadStats() {
     try {
         const response = await fetch("/api/stats");
+        const rankIcon = document.getElementById("rank-icon");
 
         if (!response.ok) {
             throw new Error("API request failed");
         }
 
         const data = await response.json();
+
+        rankIcon.src = `/static/ranks/${data.tier.toLowerCase()}.png`;
 
         document.getElementById("rank").textContent =
             `${data.tier} ${data.rank}`;
@@ -134,6 +164,7 @@ async function loadStats() {
 }
 
 loadStats();
+setInterval(loadStats, 300000);
 </script>
 
 </body>

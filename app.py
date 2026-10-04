@@ -84,9 +84,8 @@ def get_double_up_data(data):
         "games": games,
         "wins": double_up["wins"],
         "losses": double_up["losses"],
-        "winrate": f"{round(winrate,2)} %"
+        "winrate": round(winrate,2)
     }
-
 
 
 def get_match_ids(puuid, count=20):
