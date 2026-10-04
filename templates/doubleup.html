@@ -17,6 +17,28 @@
 
         .overlay {
             display: inline-block;
+            width: 190px;
+            box-sizing: border-box;
+        }
+
+        .season-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            width: 180px;
+        }
+
+        .season-label {
+            text-align: left;
+        }
+
+        .record-stats {
+            text-align: right;
+        }
+
+        .record-stats .value {
+            font-size: 20px;
+            font-weight: bold;
         }
 
         .stat {
@@ -96,7 +118,7 @@
         </div>
 
         
-        <div class="winlose">
+        <div class="record-stats">
             <div class="label">Season W/L</div>
             <div class="value" id="w/l">-</div>
             <div class="label" id="winrate">-</div>
