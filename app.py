@@ -58,6 +58,7 @@ def get_account():
 
     return riot_get(url)
 
+
 def get_tft_rank_data(puuid):
     url = (
         f"https://{REGION_ID}.api.riotgames.com"
@@ -70,8 +71,9 @@ def get_tft_rank_data(puuid):
 
     return riot_get(url)
 
+
 def get_double_up_data(data):
-    double_up = next(item for item in data if item[{QUEUE_TYPE}])
+    double_up = next(item for item in data if item["queueType"] == QUEUE_TYPE)
 
     return{
         "tier": double_up["tier"],
