@@ -17,64 +17,60 @@
 
         .overlay {
             display: inline-block;
-            width: 190px;
+            width: 600px;
             box-sizing: border-box;
         }
 
-        .season-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-end;
-            width: 180px;
-        }
-
-        .season-label {
-            text-align: left;
-        }
-
-        .record-stats {
-            text-align: right;
-        }
-
-        .record-stats .value {
-            font-size: 20px;
-            font-weight: bold;
-        }
-
-        .stat {
-            margin: 4px 0;
-        }
-
-        .label {
-            font-size: 12px;
-            opacity: 0.7;
-        }
-
-        .value {
-            font-size: 24px;
-            font-weight: bold;
+        .main-row {
+            width: 100%;
+            box-sizing: border-box;
         }
 
         .rank-container {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 6px;
         }
 
         .rank-icon {
-            width: 70px;
-            height: 70px;
+            width: 45px;
+            height: 45px;
             object-fit: contain;
         }
 
         .rank-info {
             display: flex;
             flex-direction: column;
+            text-align: left;
+        }
+
+        .season-stats {
+            display: flex;
+            flex-direction: column;
+            text-align: right;
+        }
+
+        .label {
+            font-size: 8px;
+            opacity: 0.8;
+        }
+
+        .rank-value {
+            font-size: 17px;
+            font-weight: bold;
         }
 
         .lp {
-            font-size: 14px;
-            opacity: 0.75;
+            font-size: 9px;
+        }
+
+        .win-loss {
+            font-size: 17px;
+            font-weight: bold;
+        }
+
+        .win-rate {
+            font-size: 9px;
         }
 
         #loading {
@@ -112,16 +108,16 @@
 
             <div class="rank-info">
                 <div class="label">Double Up</div>
-                <div class="value" id="rank">-</div>
+                <div class="rank-value" id="rank">-</div>
                 <div class="lp" id="lp">- LP</div>
             </div>
         </div>
 
         
-        <div class="record-stats">
+        <div class="season-stats">
             <div class="label">Season W/L</div>
-            <div class="value" id="w/l">-</div>
-            <div class="label" id="winrate">-</div>
+            <div class="win-loss" id="win-loss">-</div>
+            <div class="winrate" id="winrate">-</div>
         </div>
 <!-- 
         <div class="stat">
@@ -158,7 +154,7 @@ async function loadStats() {
         document.getElementById("lp").textContent =
             `${data.lp} LP`;
             
-        document.getElementById("w/l").textContent =
+        document.getElementById("win-loss").textContent =
             `${data.wins}-${data.losses}`;
 
         document.getElementById("winrate").textContent =
