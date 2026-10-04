@@ -95,9 +95,17 @@
             </div>
         </div>
 
-        <div class="stat">
-            <div class="label">GAMES</div>
-            <div class="value" id="games">-</div>
+        
+        <div class="games-container">
+            <div class="games">
+                <div class="label">GAMES</div>
+                <div class="value" id="games">-</div>
+            </div>
+
+            <div class="wins">
+                <div class="label">WINS</div>
+                <div class="value" id="wins">-</div>
+            </div>
         </div>
 
         <div class="stat">
@@ -143,7 +151,7 @@ async function loadStats() {
             data.games;
 
         document.getElementById("winrate").textContent =
-            `${data.win_rate}%`;
+            `${data.winrate}%`;
 
         // document.getElementById("top2-rate").textContent =
         //     `${data.top2_rate}%`;
