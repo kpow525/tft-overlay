@@ -18,6 +18,7 @@ RIOT_GAME_NAME = os.environ["RIOT_GAME_NAME"]
 RIOT_TAG_LINE = os.environ["RIOT_TAG_LINE"]
 
 REGION = "americas"
+REGION_ID = "na1"
 
 DOUBLE_UP_QUEUE_ID = 1160
 QUEUE_TYPE = "RANKED_TFT_DOUBLE_UP"
@@ -59,7 +60,7 @@ def get_account():
 
 def get_tft_rank_data(puuid):
     url = (
-        f"https://{REGION}.api.riotgames.com"
+        f"https://{REGION_ID}.api.riotgames.com"
         f"/tft/league/v1/by-puuid/"
         f"{puuid}"
     )
