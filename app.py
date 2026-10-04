@@ -71,7 +71,7 @@ def get_tft_rank_data(puuid):
     return riot_get(url)
 
 def get_double_up_data(data):
-    double_up = next(item for item in data if item[QUEUE_TYPE])
+    double_up = next(item for item in data if item[{QUEUE_TYPE}])
 
     return{
         "tier": double_up["tier"],
