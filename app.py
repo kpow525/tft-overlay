@@ -57,7 +57,7 @@ def get_account():
     return riot_get(url)
 
 
-def get_match_ids(puuid, count=5):
+def get_match_ids(puuid, count=20):
     url = (
         f"https://{REGION}.api.riotgames.com"
         f"/tft/match/v1/matches/by-puuid/"
@@ -159,7 +159,7 @@ def stats():
 
     match_ids = get_match_ids(
         puuid,
-        count=100,
+        count=20,
     )
 
     double_up_stats = get_double_up_stats(
