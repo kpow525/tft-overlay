@@ -17,11 +17,14 @@
 
         .overlay {
             display: inline-block;
-            width: 600px;
+            width: 200px;
             box-sizing: border-box;
         }
 
         .main-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             width: 100%;
             box-sizing: border-box;
         }
@@ -69,7 +72,7 @@
             font-weight: bold;
         }
 
-        .win-rate {
+        .winrate {
             font-size: 9px;
         }
 
@@ -96,12 +99,7 @@
         Unable to load stats
     </div>
 
-    <div id="stats" style="display: none;">
-<!-- 
-        <div class="stat">
-            <div class="label">RANK</div>
-            <div class="value" id="rank">-</div>
-        </div> -->
+    <div id="main-row" style="display: none;">
 
         <div class="rank-container">
             <img id="rank-icon" class="rank-icon" src="" alt="Rank">
@@ -112,26 +110,13 @@
                 <div class="lp" id="lp">- LP</div>
             </div>
         </div>
-
         
         <div class="season-stats">
             <div class="label">Season W/L</div>
             <div class="win-loss" id="win-loss">-</div>
             <div class="winrate" id="winrate">-</div>
         </div>
-<!-- 
-        <div class="stat">
-            <div class="label">TOP 2 RATE</div>
-            <div class="value" id="top2-rate">-</div>
-        </div>
-
-        <div class="stat">
-            <div class="label">AVERAGE PLACEMENT</div>
-            <div class="value" id="average-placement">-</div>
-        </div> -->
-
     </div>
-
 </div>
 
 <script>
