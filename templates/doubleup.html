@@ -17,7 +17,7 @@
 
         .overlay {
             display: inline-block;
-            width: 600px;
+            width: 400px;
             height: 100px;
             box-sizing: border-box;
         }
@@ -108,7 +108,7 @@
                 <img id="rank-icon" class="rank-icon" src="" alt="Rank">
 
                 <div class="rank-info">
-                    <div class="label">Double Up</div>
+                    <div class="label" id="gamename">-</div>
                     <div class="rank-value" id="rank">-</div>
                     <div class="lp" id="lp">- LP</div>
                 </div>
@@ -126,14 +126,26 @@
 <script>
 async function loadStats() {
     try {
-        const response = await fetch("/api/stats");
-        const rankIcon = document.getElementById("rank-icon");
+        const params = new URLSearchParams(window.location.search);
+
+        const gameName = params.get("gameName");
+        const tagLine = params.get("tagLine");
+        
+        if (!gameName || !tagLine) {
+            throw new Error("Missing gameName or tagLine");
+        }
+
+        const response = await fetch(
+            `/api/stats?gameName=${encodeURIComponent(gameName)}&tagLine=${encodeURIComponent(tagLine)}`
+        );
 
         if (!response.ok) {
             throw new Error("API request failed");
         }
 
         const data = await response.json();
+
+        const rankIcon = document.getElementById("rank-icon");
 
         rankIcon.src = `/static/ranks/${data.tier.toLowerCase()}.png`;
 

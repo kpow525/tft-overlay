@@ -2,14 +2,11 @@ import os
 
 import requests
 import time
-from flask import Flask, jsonify, render_template
+from flask import Flask, jsonify, render_template, request
 
 CACHE_DURATION = 300  # 5 minutes
 
-stats_cache = {
-    "timestamp": 0,
-    "data": None,
-}
+stats_cache = {}
 
 app = Flask(__name__)
 
@@ -50,7 +47,7 @@ def get_account():
     url = (
         f"https://{REGION}.api.riotgames.com"
         f"/riot/account/v1/accounts/by-riot-id/"
-        f"{RIOT_GAME_NAME}/{RIOT_TAG_LINE}"
+        f"{game_name}/{tag_line}"
     )
 
     global TOTAL_REQUESTS
@@ -174,8 +171,24 @@ def home():
 
 @app.route("/api/stats")
 def stats():
+    game_name = request.args.get("gameName")
+    tag_line = request.args.get("tagLine")
+
+    if not game_name or not tag_line:
+        return jsonify({
+            "error": "gameName and tagLine are required"
+        }), 400
+
+    cache_key = f"{game_name.lower()}#{tag_line.lower()}"
+
     now = time.time()
 
+    if cache_key in stats_cache:
+        cached = stats_cache[cache_key]
+
+        if now - cached["timestamp"] < CACHE_DURATION:
+            return jsonify(cached["data"])
+    
     # Return cached data if it is still fresh
     if (
         stats_cache["data"] is not None
@@ -183,7 +196,7 @@ def stats():
     ):
         return jsonify(stats_cache["data"])
 
-    account = get_account()
+    account = get_account(game_name, tag_line)
 
     puuid = account["puuid"]
 
@@ -212,8 +225,10 @@ def stats():
     }
 
     # Save result in cache
-    stats_cache["timestamp"] = now
-    stats_cache["data"] = data
+    stats_cache[cache_key] = {
+        "timestamp": now,
+        "data": data,
+    }
 
     return jsonify(data)
 
