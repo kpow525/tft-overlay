@@ -89,23 +89,16 @@
             <img id="rank-icon" class="rank-icon" src="" alt="Rank">
 
             <div class="rank-info">
-                <div class="label">RANK</div>
+                <div class="label">Double Up</div>
                 <div class="value" id="rank">-</div>
                 <div class="lp" id="lp">- LP</div>
             </div>
         </div>
 
         
-        <div class="games-container">
-            <div class="games">
-                <div class="label">GAMES</div>
-                <div class="value" id="games">-</div>
-            </div>
-
-            <div class="wins">
-                <div class="label">WINS</div>
-                <div class="value" id="wins">-</div>
-            </div>
+        <div class="winlose">
+            <div class="label">Season W/L</div>
+            <div class="value" id="w/l">-</div>
         </div>
 
         <div class="stat">
@@ -149,6 +142,9 @@ async function loadStats() {
 
         document.getElementById("games").textContent =
             data.games;
+            
+        document.getElementById("w/l").textContent =
+            `${data.wins}-${data.losses}`;
 
         document.getElementById("winrate").textContent =
             `${data.winrate}%`;
