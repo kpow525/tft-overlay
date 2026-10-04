@@ -21,6 +21,8 @@ REGION = "americas"
 
 DOUBLE_UP_QUEUE_ID = 1100
 
+TOTAL_REQUESTS = 0
+
 HEADERS = {
     "X-Riot-Token": RIOT_API_KEY
 }
@@ -36,7 +38,7 @@ def riot_get(url, params=None):
 
     if response.status_code != 200:
         raise RuntimeError(
-            f"Riot API returned {response.status_code}: {response.text}"
+            f"Total requests were: {TOTAL_REQUESTS}. Riot API returned {response.status_code}: {response.text}"
         )
 
     return response.json()
@@ -49,6 +51,8 @@ def get_account():
         f"{RIOT_GAME_NAME}/{RIOT_TAG_LINE}"
     )
 
+    TOTAL_REQUESTS += 1
+
     return riot_get(url)
 
 
@@ -59,6 +63,8 @@ def get_match_ids(puuid, count=5):
         f"{puuid}/ids"
     )
 
+    TOTAL_REQUESTS += 1
+
     return riot_get(url, params={"count": count})
 
 
@@ -67,6 +73,8 @@ def get_match(match_id):
         f"https://{REGION}.api.riotgames.com"
         f"/tft/match/v1/matches/{match_id}"
     )
+
+    TOTAL_REQUESTS += 1
 
     return riot_get(url)
 
