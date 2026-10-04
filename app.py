@@ -19,7 +19,8 @@ RIOT_TAG_LINE = os.environ["RIOT_TAG_LINE"]
 
 REGION = "americas"
 
-DOUBLE_UP_QUEUE_ID = 1100
+DOUBLE_UP_QUEUE_ID = 1160
+QUEUE_TYPE = "RANKED_TFT_DOUBLE_UP"
 
 TOTAL_REQUESTS = 0
 
@@ -55,6 +56,30 @@ def get_account():
     TOTAL_REQUESTS += 1
 
     return riot_get(url)
+
+def get_tft_rank_data(puuid):
+    url = (
+        f"https://{REGION}.api.riotgames.com"
+        f"/tft/league/v1/by-puuid/"
+        f"{puuid}"
+    )
+    
+    global TOTAL_REQUESTS
+    TOTAL_REQUESTS += 1
+
+    return riot_get(url)
+
+def get_double_up_data(data):
+    double_up = next(item for item in data if item[QUEUE_TYPE])
+
+    return{
+        "tier": double_up["tier"],
+        "rank": double_up["rank"],
+        "lp:": double_up["leaguePoints"],
+        "wins": double_up["wins"],
+        "losses": double_up["losses"]
+    }
+
 
 
 def get_match_ids(puuid, count=20):
@@ -157,6 +182,10 @@ def stats():
 
     puuid = account["puuid"]
 
+    tft_rank_data = get_tft_rank_data(puuid)
+
+    double_up_data = get_double_up_data(tft_rank_data)
+
     match_ids = get_match_ids(
         puuid,
         count=20,
@@ -174,6 +203,7 @@ def stats():
         "queue": "Double Up",
         "queue_id": DOUBLE_UP_QUEUE_ID,
         **double_up_stats,
+        **double_up_data,
     }
 
     # Save result in cache
