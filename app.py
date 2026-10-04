@@ -52,7 +52,7 @@ def get_account():
     return riot_get(url)
 
 
-def get_match_ids(puuid, count=20):
+def get_match_ids(puuid, count=10):
     url = (
         f"https://{REGION}.api.riotgames.com"
         f"/tft/match/v1/matches/by-puuid/"
