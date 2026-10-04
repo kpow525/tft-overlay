@@ -23,6 +23,7 @@ DOUBLE_UP_QUEUE_ID = 1160
 QUEUE_TYPE = "RANKED_TFT_DOUBLE_UP"
 
 TOTAL_REQUESTS = 0
+LAST_URL = ""
 
 HEADERS = {
     "X-Riot-Token": RIOT_API_KEY
@@ -39,7 +40,7 @@ def riot_get(url, params=None):
 
     if response.status_code != 200:
         raise RuntimeError(
-            f"Total requests were: {TOTAL_REQUESTS}. Riot API returned {response.status_code}: {response.text}"
+            f"Total requests were: {TOTAL_REQUESTS}. Last URL was: {LAST_URL}. Riot API returned {response.status_code}: {response.text}"
         )
 
     return response.json()
@@ -63,7 +64,8 @@ def get_tft_rank_data(puuid):
         f"/tft/league/v1/by-puuid/"
         f"{puuid}"
     )
-    
+    global LAST_URL
+    LAST_URL = url
     global TOTAL_REQUESTS
     TOTAL_REQUESTS += 1
 
