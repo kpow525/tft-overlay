@@ -51,6 +51,7 @@ def get_account():
         f"{RIOT_GAME_NAME}/{RIOT_TAG_LINE}"
     )
 
+    global TOTAL_REQUESTS
     TOTAL_REQUESTS += 1
 
     return riot_get(url)
@@ -63,6 +64,7 @@ def get_match_ids(puuid, count=5):
         f"{puuid}/ids"
     )
 
+    global TOTAL_REQUESTS
     TOTAL_REQUESTS += 1
 
     return riot_get(url, params={"count": count})
@@ -74,6 +76,7 @@ def get_match(match_id):
         f"/tft/match/v1/matches/{match_id}"
     )
 
+    global TOTAL_REQUESTS
     TOTAL_REQUESTS += 1
 
     return riot_get(url)
