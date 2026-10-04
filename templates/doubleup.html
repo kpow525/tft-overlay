@@ -11,7 +11,7 @@
             margin: 0;
             padding: 0;
             background: transparent;
-            color: white;
+            color: rgb(19, 204, 218);
             font-family: Arial, sans-serif;
         }
 
@@ -75,9 +75,9 @@
 
         <div class="stat">
             <div class="label">WIN RATE</div>
-            <div class="value" id="win-rate">-</div>
+            <div class="value" id="winrate">-</div>
         </div>
-
+<!-- 
         <div class="stat">
             <div class="label">TOP 2 RATE</div>
             <div class="value" id="top2-rate">-</div>
@@ -86,7 +86,7 @@
         <div class="stat">
             <div class="label">AVERAGE PLACEMENT</div>
             <div class="value" id="average-placement">-</div>
-        </div>
+        </div> -->
 
     </div>
 
@@ -112,14 +112,14 @@ async function loadStats() {
         document.getElementById("games").textContent =
             data.games;
 
-        document.getElementById("win-rate").textContent =
+        document.getElementById("winrate").textContent =
             `${data.win_rate}%`;
 
-        document.getElementById("top2-rate").textContent =
-            `${data.top2_rate}%`;
+        // document.getElementById("top2-rate").textContent =
+        //     `${data.top2_rate}%`;
 
-        document.getElementById("average-placement").textContent =
-            data.average_placement ?? "-";
+        // document.getElementById("average-placement").textContent =
+        //     data.average_placement ?? "-";
 
         document.getElementById("loading").style.display = "none";
         document.getElementById("error").style.display = "none";

@@ -74,14 +74,17 @@ def get_tft_rank_data(puuid):
 
 def get_double_up_data(data):
     double_up = next(item for item in data if item["queueType"] == QUEUE_TYPE)
+    games = double_up["wins"] + double_up["losses"]
+    winrate = double_up["wins"]/games * 100
 
     return{
         "tier": double_up["tier"],
         "rank": double_up["rank"],
         "lp": double_up["leaguePoints"],
+        "games": games,
         "wins": double_up["wins"],
         "losses": double_up["losses"],
-        "W/L": f"{double_up["wins"]/(double_up["wins"] + double_up["losses"]) * 100}%"
+        "winrate": f"{round(winrate,2)} %"
     }
 
 
