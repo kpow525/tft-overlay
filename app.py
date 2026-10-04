@@ -40,7 +40,7 @@ def riot_get(url, params=None):
 
     if response.status_code != 200:
         raise RuntimeError(
-            f"Total requests were: {TOTAL_REQUESTS}. Last request was: {response}. Riot API returned {response.status_code}: {response.text}"
+            f"Total requests were: {TOTAL_REQUESTS}. Riot API returned {response.status_code}: {response.text}"
         )
 
     return response.json()
@@ -132,7 +132,6 @@ def get_double_up_stats(puuid, match_ids):
 
     if not placements:
         return {
-            "games": 0,
             "wins": 0,
             "win_rate": 0,
             "top2": 0,
@@ -153,12 +152,12 @@ def get_double_up_stats(puuid, match_ids):
     )
 
     return {
-        "games": games,
-        "wins": wins,
-        "win_rate": round(wins / games * 100, 2),
-        "top2": top2,
-        "top2_rate": round(top2 / games * 100, 2),
-        "average_placement": round(
+        "games/20": games,
+        "wins/20": wins,
+        "win_rate/20": round(wins / games * 100, 2),
+        "top2/20": top2,
+        "top2_rate/20": round(top2 / games * 100, 2),
+        "average_placement/20": round(
             sum(placements) / games,
             2,
         ),
