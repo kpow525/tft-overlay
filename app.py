@@ -2,7 +2,7 @@ import os
 
 import requests
 import time
-from flask import Flask, jsonify
+from flask import Flask, jsonify, render_template
 
 CACHE_DURATION = 300  # 5 minutes
 
@@ -80,7 +80,8 @@ def get_double_up_data(data):
         "rank": double_up["rank"],
         "lp": double_up["leaguePoints"],
         "wins": double_up["wins"],
-        "losses": double_up["losses"]
+        "losses": double_up["losses"],
+        "W/L": f"{double_up["wins"]/(double_up["wins"] + double_up["losses"]) * 100}%"
     }
 
 
@@ -224,6 +225,9 @@ def refresh():
         "message": "Cache cleared. Next stats request will refresh from Riot."
     })
 
+@app.route("/doubleup")
+def doubleup():
+    return render_template("doubleup.html")
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))

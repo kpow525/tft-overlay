@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Double Up Stats</title>
+
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            background: transparent;
+            color: white;
+            font-family: Arial, sans-serif;
+        }
+
+        .overlay {
+            display: inline-block;
+        }
+
+        .stat {
+            margin: 4px 0;
+        }
+
+        .label {
+            font-size: 12px;
+            opacity: 0.7;
+        }
+
+        .value {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        #loading {
+            opacity: 0.7;
+        }
+
+        #error {
+            display: none;
+            color: #ff6b6b;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="overlay">
+
+    <div id="loading">
+        Loading...
+    </div>
+
+    <div id="error">
+        Unable to load stats
+    </div>
+
+    <div id="stats" style="display: none;">
+
+        <div class="stat">
+            <div class="label">RANK</div>
+            <div class="value" id="rank">-</div>
+        </div>
+
+        <div class="stat">
+            <div class="label">LP</div>
+            <div class="value" id="lp">-</div>
+        </div>
+
+        <div class="stat">
+            <div class="label">GAMES</div>
+            <div class="value" id="games">-</div>
+        </div>
+
+        <div class="stat">
+            <div class="label">WIN RATE</div>
+            <div class="value" id="win-rate">-</div>
+        </div>
+
+        <div class="stat">
+            <div class="label">TOP 2 RATE</div>
+            <div class="value" id="top2-rate">-</div>
+        </div>
+
+        <div class="stat">
+            <div class="label">AVERAGE PLACEMENT</div>
+            <div class="value" id="average-placement">-</div>
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+async function loadStats() {
+    try {
+        const response = await fetch("/api/stats");
+
+        if (!response.ok) {
+            throw new Error("API request failed");
+        }
+
+        const data = await response.json();
+
+        document.getElementById("rank").textContent =
+            `${data.tier} ${data.rank}`;
+
+        document.getElementById("lp").textContent =
+            `${data.lp} LP`;
+
+        document.getElementById("games").textContent =
+            data.games;
+
+        document.getElementById("win-rate").textContent =
+            `${data.win_rate}%`;
+
+        document.getElementById("top2-rate").textContent =
+            `${data.top2_rate}%`;
+
+        document.getElementById("average-placement").textContent =
+            data.average_placement ?? "-";
+
+        document.getElementById("loading").style.display = "none";
+        document.getElementById("error").style.display = "none";
+        document.getElementById("stats").style.display = "block";
+
+    } catch (error) {
+        console.error(error);
+
+        document.getElementById("loading").style.display = "none";
+        document.getElementById("error").style.display = "block";
+    }
+}
+
+loadStats();
+</script>
+
+</body>
+</html>
