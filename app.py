@@ -1,7 +1,15 @@
 import os
 
 import requests
+import time
 from flask import Flask, jsonify
+
+CACHE_DURATION = 300  # 5 minutes
+
+stats_cache = {
+    "timestamp": 0,
+    "data": None,
+}
 
 app = Flask(__name__)
 
@@ -44,7 +52,7 @@ def get_account():
     return riot_get(url)
 
 
-def get_match_ids(puuid, count=100):
+def get_match_ids(puuid, count=20):
     url = (
         f"https://{REGION}.api.riotgames.com"
         f"/tft/match/v1/matches/by-puuid/"
@@ -125,6 +133,15 @@ def home():
 
 @app.route("/api/stats")
 def stats():
+    now = time.time()
+
+    # Return cached data if it is still fresh
+    if (
+        stats_cache["data"] is not None
+        and now - stats_cache["timestamp"] < CACHE_DURATION
+    ):
+        return jsonify(stats_cache["data"])
+
     account = get_account()
 
     puuid = account["puuid"]
@@ -139,13 +156,29 @@ def stats():
         match_ids,
     )
 
-    return jsonify({
+    data = {
         "riot_id": (
             f"{account['gameName']}#{account['tagLine']}"
         ),
         "queue": "Double Up",
         "queue_id": DOUBLE_UP_QUEUE_ID,
         **double_up_stats,
+    }
+
+    # Save result in cache
+    stats_cache["timestamp"] = now
+    stats_cache["data"] = data
+
+    return jsonify(data)
+
+
+@app.route("/api/refresh")
+def refresh():
+    stats_cache["timestamp"] = 0
+    stats_cache["data"] = None
+
+    return jsonify({
+        "message": "Cache cleared. Next stats request will refresh from Riot."
     })
 
 
