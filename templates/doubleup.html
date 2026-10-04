@@ -42,6 +42,12 @@
             object-fit: contain;
         }
 
+        .player-name {
+            font-size: 10px;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
         .rank-info {
             display: flex;
             flex-direction: column;
@@ -69,7 +75,7 @@
         }
 
         .win-loss {
-            font-size: 34px;
+            font-size: 28px;
             font-weight: bold;
         }
 
@@ -108,7 +114,7 @@
                 <img id="rank-icon" class="rank-icon" src="" alt="Rank">
 
                 <div class="rank-info">
-                    <div class="label" id="gameName">- <div class="label" id="tagLine"></div>
+                    <div class="player-name" id="player-name">-</div>
                     <div class="rank-value" id="rank">-</div>
                     <div class="lp" id="lp">- LP</div>
                 </div>
@@ -148,6 +154,9 @@ async function loadStats() {
         const rankIcon = document.getElementById("rank-icon");
 
         rankIcon.src = `/static/ranks/${data.tier.toLowerCase()}.png`;
+
+        document.getElementById("player-name").textContent =
+            data.riot_id;
 
         document.getElementById("rank").textContent =
             `${data.tier} ${data.rank}`;
