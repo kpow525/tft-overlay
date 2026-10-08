@@ -1,107 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-html, body {
-    margin: 0;
-    padding: 0;
-    background: transparent;
-    color: rgb(19, 204, 218);
-    font-family: Arial, sans-serif;
+    <title>Double Up Stats</title>
+
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            background: transparent;
+            color: rgb(19, 204, 218);
+            font-family: Arial, sans-serif;
+        }
+
+        .overlay {
+            display: inline-block;
+            width: 450px;
+            height: 110;
+            box-sizing: border-box;
+            /* Background */
+            background: rgba(12, 16, 24, 0.88);
+            border-radius: 12px;
+
+            /* Spacing */
+            padding: 10px 12px;
+
+            /* Optional subtle outline */
+            border: 1px solid rgba(255, 255, 255, 0.12);
+        }
+
+        .main-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .rank-container {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .rank-icon {
+            width: 100px;
+            height: 100px;
+            object-fit: contain;
+        }
+
+        .player-name {
+            font-size: 16px;
+            white-space: nowrap;
+        }
+
+        .rank-info {
+            display: flex;
+            flex-direction: column;
+            text-align: left;
+        }
+
+        .season-stats {
+            display: flex;
+            flex-direction: column;
+            text-align: right;
+        }
+
+        .label {
+            font-size: 16px;
+            opacity: 0.8;
+        }
+
+        .rank-value {
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .lp {
+            font-size: 18px;
+        }
+
+        .win-loss {
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .winrate {
+            font-size: 18px;
+        }
+
+        #loading {
+            opacity: 0.7;
+        }
+
+        #error {
+            display: none;
+            color: #ff6b6b;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="overlay">
+
+    <div id="loading">
+        Loading...
+    </div>
+
+    <div id="error">
+        Unable to load stats
+    </div>
+
+    <div id="stats" style="display: none;">
+
+        <div class="main-row">
+
+            <div class="rank-container">
+                <img id="rank-icon" class="rank-icon" src="" alt="Rank">
+
+                <div class="rank-info">
+                    <div class="player-name" id="player-name">-</div>
+                    <div class="rank-value" id="rank">-</div>
+                    <div class="lp" id="lp">- LP</div>
+                </div>
+            </div>
+            
+            <div class="season-stats">
+                <div class="label">Season W/L</div>
+                <div class="win-loss" id="win-loss">-</div>
+                <div class="winrate" id="winrate">-</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+async function loadStats() {
+    try {
+        const params = new URLSearchParams(window.location.search);
+
+        const gameName = params.get("gameName");
+        const tagLine = params.get("tagLine");
+        
+        if (!gameName || !tagLine) {
+            throw new Error("Missing gameName or tagLine");
+        }
+
+        const response = await fetch(
+            `/api/stats?gameName=${encodeURIComponent(gameName)}&tagLine=${encodeURIComponent(tagLine)}`
+        );
+
+        if (!response.ok) {
+            throw new Error("API request failed");
+        }
+
+        const data = await response.json();
+
+        const rankIcon = document.getElementById("rank-icon");
+
+        rankIcon.src = `/static/ranks/${data.tier.toLowerCase()}.png`;
+
+        document.getElementById("player-name").textContent =
+            data.riot_id;
+
+        document.getElementById("rank").textContent =
+            `${data.tier} ${data.rank}`;
+
+        document.getElementById("lp").textContent =
+            `${data.lp} LP`;
+            
+        document.getElementById("win-loss").textContent =
+            `${data.wins}-${data.losses}`;
+
+        document.getElementById("winrate").textContent =
+            `${data.winrate}%`;
+
+        // document.getElementById("top2-rate").textContent =
+        //     `${data.top2_rate}%`;
+
+        // document.getElementById("average-placement").textContent =
+        //     data.average_placement ?? "-";
+
+        document.getElementById("loading").style.display = "none";
+        document.getElementById("error").style.display = "none";
+        document.getElementById("stats").style.display = "block";
+
+    } catch (error) {
+        console.error(error);
+
+        document.getElementById("loading").style.display = "none";
+        document.getElementById("error").style.display = "block";
+    }
 }
 
-.overlay {
-    width: 400px;
-    height: 100px;
-    box-sizing: border-box;
+loadStats();
+setInterval(loadStats, 300000);
+</script>
 
-    background: rgba(12, 16, 24, 0.92);
-    border-radius: 12px;
-    border: 1px solid rgba(19, 204, 218, 0.45);
-
-    padding: 8px 14px;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-#stats {
-    width: 100%;
-}
-
-.main-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-    gap: 12px;
-}
-
-.rank-container {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    min-width: 0;
-}
-
-.rank-icon {
-    width: 72px;
-    height: 80px;
-    object-fit: contain;
-    flex-shrink: 0;
-}
-
-.rank-info {
-    display: flex;
-    flex-direction: column;
-    text-align: left;
-    line-height: 1.05;
-}
-
-.player-name {
-    font-size: 16px;
-    font-weight: 600;
-    white-space: nowrap;
-}
-
-.rank-value {
-    font-size: 27px;
-    font-weight: bold;
-    white-space: nowrap;
-}
-
-.lp {
-    font-size: 18px;
-}
-
-.season-stats {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    text-align: right;
-    flex-shrink: 0;
-    line-height: 1.05;
-}
-
-.label {
-    font-size: 15px;
-    opacity: 0.8;
-    white-space: nowrap;
-}
-
-.win-loss {
-    font-size: 27px;
-    font-weight: bold;
-    white-space: nowrap;
-}
-
-.winrate {
-    font-size: 18px;
-}
-
-#loading {
-    opacity: 0.7;
-}
-
-#error {
-    display: none;
-    color: #ff6b6b;
-}
+</body>
+</html>
