@@ -254,10 +254,6 @@ def stats():
             "error": "gameName and tagLine are required"
         }), 400
 
-    cache_key = (
-        f"{mode}:{game_name.lower()}#{tag_line.lower()}"
-    )
-
     now = time.time()
 
     mode = request.args.get(
@@ -266,6 +262,11 @@ def stats():
 
     if mode not in QUEUE_MODES:
         return jsonify({"error": "Invalid mode"}), 400
+
+    
+    cache_key = (
+        f"{mode}:{game_name.lower()}#{tag_line.lower()}"
+    )
 
     config = QUEUE_MODES[mode]
 
