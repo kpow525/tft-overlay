@@ -15,21 +15,18 @@
             font-family: Arial, sans-serif;
         }
 
+        
         .overlay {
             display: inline-block;
             width: 450px;
-            height: 110px;
             box-sizing: border-box;
-            /* Background */
+
             background: rgba(12, 16, 24, 0.88);
             border-radius: 12px;
-
-            /* Spacing */
             padding: 10px 12px;
-
-            /* Optional subtle outline */
             border: 1px solid rgba(212, 175, 55, 0.555);
         }
+
 
         .main-row {
             display: flex;
@@ -93,24 +90,34 @@
 
 
         /* Placement history */
+        #history-section {
+            margin-top: 8px;
+            padding-top: 7px;
+            border-top: 1px solid rgba(255, 255, 255, 0.12);
+        }
+
+        .history-title {
+            font-size: 11px;
+            opacity: 0.7;
+            margin-bottom: 6px;
+        }
+
         .placement-history {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            gap: 5px;
-            margin-top: 8px;
+            gap: 6px;
         }
 
         .placement {
+            flex: 1;
+            height: 25px;
             display: flex;
             align-items: center;
             justify-content: center;
-            width: 28px;
-            height: 28px;
-            border-radius: 6px;
-            background: rgba(255, 255, 255, 0.08);
+            border-radius: 5px;
             color: white;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: bold;
             box-sizing: border-box;
         }
@@ -140,13 +147,6 @@
             background: #713b48;
         }
 
-        .history-title {
-            font-size: 12px;
-            opacity: 0.8;
-            margin-top: 7px;
-        }
-
-
         #loading {
             opacity: 0.7;
         }
@@ -170,6 +170,7 @@
         Unable to load stats
     </div>
 
+    
     <div id="stats" style="display: none;">
 
         <div class="main-row">
@@ -183,19 +184,22 @@
                     <div class="lp" id="lp">- LP</div>
                 </div>
             </div>
-            
+
             <div class="season-stats">
                 <div class="label">Season W/L</div>
                 <div class="win-loss" id="win-loss">-</div>
                 <div class="winrate" id="winrate">-</div>
             </div>
 
-            <div id="history-section" style="display: none;">
-                <div class="history-title">LAST 10 PLACEMENTS</div>
-                <div id="placement-history" class="placement-history"></div>
-            </div>
         </div>
+
+        <div id="history-section" style="display: none;">
+            <div class="history-title">LAST 10 PLACEMENTS</div>
+            <div id="placement-history" class="placement-history"></div>
+        </div>
+
     </div>
+
 </div>
 
 <script>
