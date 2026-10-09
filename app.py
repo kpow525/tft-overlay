@@ -17,8 +17,16 @@ RIOT_TAG_LINE = os.environ["RIOT_TAG_LINE"]
 REGION = "americas"
 REGION_ID = "na1"
 
-DOUBLE_UP_QUEUE_ID = 1160
-QUEUE_TYPE = "RANKED_TFT_DOUBLE_UP"
+QUEUE_MODES = {
+    "solo": {
+        "queue_id": 1100,
+        "queue_type": "RANKED_TFT",
+    },
+    "doubleup": {
+        "queue_id": 1160,
+        "queue_type": "RANKED_TFT_DOUBLE_UP",
+    },
+}
 
 TOTAL_REQUESTS = 0
 
@@ -69,30 +77,87 @@ def get_tft_rank_data(puuid):
     return riot_get(url)
 
 
-def get_double_up_data(data):
-    double_up = next(
-        item
-        for item in data
-        if item["queueType"] == QUEUE_TYPE
+# def get_double_up_data(data):
+#     double_up = next(
+#         item
+#         for item in data
+#         if item["queueType"] == QUEUE_TYPE
+#     )
+
+#     games = double_up["wins"] + double_up["losses"]
+
+#     winrate = (
+#         double_up["wins"] / games * 100
+#         if games > 0
+#         else 0
+#     )
+
+#     return {
+#         "tier": double_up["tier"],
+#         "rank": double_up["rank"],
+#         "lp": double_up["leaguePoints"],
+#         "games": games,
+#         "wins": double_up["wins"],
+#         "losses": double_up["losses"],
+#         "winrate": round(winrate, 2),
+#     }
+
+
+def get_rank_data(data, queue_type):
+    ranked = next(
+        (
+            item for item in data
+            if item.get("queueType") == queue_type
+        ),
+        None,
     )
 
-    games = double_up["wins"] + double_up["losses"]
+    if ranked is None:
+        return {
+            "tier": "UNRANKED",
+            "rank": "",
+            "lp": 0,
+            "wins": 0,
+            "losses": 0,
+            "winrate": 0,
+        }
 
-    winrate = (
-        double_up["wins"] / games * 100
-        if games > 0
-        else 0
-    )
+    wins = ranked["wins"]
+    losses = ranked["losses"]
+    games = wins + losses
 
     return {
-        "tier": double_up["tier"],
-        "rank": double_up["rank"],
-        "lp": double_up["leaguePoints"],
-        "games": games,
-        "wins": double_up["wins"],
-        "losses": double_up["losses"],
-        "winrate": round(winrate, 2),
+        "tier": ranked["tier"],
+        "rank": ranked["rank"],
+        "lp": ranked["leaguePoints"],
+        "wins": wins,
+        "losses": losses,
+        "winrate": round(wins / games * 100, 2)
+            if games else 0,
     }
+
+
+def get_placement_history(puuid, queue_id, limit=10):
+    match_ids = get_match_ids(puuid, count=20)
+    placements = []
+
+    for match_id in match_ids:
+        match = get_match(match_id)
+        info = match.get("info", {})
+
+        if info.get("queue_id") != queue_id:
+            continue
+
+        for participant in info.get("participants", []):
+            if participant.get("puuid") == puuid:
+                placements.append(participant["placement"])
+                break
+
+        if len(placements) >= limit:
+            break
+
+    # Match IDs are newest-first. Reverse for chronological display.
+    return list(reversed(placements))
 
 
 def get_match_ids(puuid, count=20):
@@ -189,9 +254,20 @@ def stats():
             "error": "gameName and tagLine are required"
         }), 400
 
-    cache_key = f"{game_name.lower()}#{tag_line.lower()}"
+    cache_key = (
+        f"{mode}:{game_name.lower()}#{tag_line.lower()}"
+    )
 
     now = time.time()
+
+    mode = request.args.get(
+        "mode", "doubleup"
+    ).lower()
+
+    if mode not in QUEUE_MODES:
+        return jsonify({"error": "Invalid mode"}), 400
+
+    config = QUEUE_MODES[mode]
 
     # Return cached data for this player
     if cache_key in stats_cache:
@@ -201,34 +277,28 @@ def stats():
             return jsonify(cached["data"])
 
     account = get_account(game_name, tag_line)
-
     puuid = account["puuid"]
 
-    tft_rank_data = get_tft_rank_data(puuid)
+    rank_data = get_tft_rank_data(puuid)
 
-    double_up_data = get_double_up_data(tft_rank_data)
-
-    match_ids = get_match_ids(
-        puuid,
-        count=20,
+    rank_stats = get_rank_data(
+        rank_data,
+        config["queue_type"],
     )
 
-    double_up_stats = get_double_up_stats(
+    placements = get_placement_history(
         puuid,
-        match_ids,
+        config["queue_id"],
+        limit=10,
     )
 
     data = {
         "riot_id": (
             f"{account['gameName']}#{account['tagLine']}"
         ),
-        "queue": "Double Up",
-        "queue_id": DOUBLE_UP_QUEUE_ID,
-
-        **double_up_data,
-
-        # match-history stats, need more api calls...
-        # **double_up_stats,
+        "mode": mode,
+        **rank_stats,
+        "placements": placements,
     }
 
     stats_cache[cache_key] = {

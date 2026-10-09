@@ -18,7 +18,7 @@
         .overlay {
             display: inline-block;
             width: 450px;
-            height: 110;
+            height: 110px;
             box-sizing: border-box;
             /* Background */
             background: rgba(12, 16, 24, 0.88);
@@ -91,6 +91,62 @@
             font-size: 18px;
         }
 
+
+        /* Placement history */
+        .placement-history {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 5px;
+            margin-top: 8px;
+        }
+
+        .placement {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.08);
+            color: white;
+            font-size: 14px;
+            font-weight: bold;
+            box-sizing: border-box;
+        }
+
+        .placement.p1 {
+            background: #c9a227;
+            color: #101010;
+        }
+
+        .placement.p2 {
+            background: #aab5c5;
+            color: #101010;
+        }
+
+        .placement.p3,
+        .placement.p4 {
+            background: #258b91;
+        }
+
+        .placement.p5,
+        .placement.p6 {
+            background: #344355;
+        }
+
+        .placement.p7,
+        .placement.p8 {
+            background: #713b48;
+        }
+
+        .history-title {
+            font-size: 12px;
+            opacity: 0.8;
+            margin-top: 7px;
+        }
+
+
         #loading {
             opacity: 0.7;
         }
@@ -133,6 +189,11 @@
                 <div class="win-loss" id="win-loss">-</div>
                 <div class="winrate" id="winrate">-</div>
             </div>
+
+            <div id="history-section" style="display: none;">
+                <div class="history-title">LAST 10 PLACEMENTS</div>
+                <div id="placement-history" class="placement-history"></div>
+            </div>
         </div>
     </div>
 </div>
@@ -149,8 +210,14 @@ async function loadStats() {
             throw new Error("Missing gameName or tagLine");
         }
 
+        const mode = (
+            params.get("mode") || "doubleup"
+        ).toLowerCase();
+
         const response = await fetch(
-            `/api/stats?gameName=${encodeURIComponent(gameName)}&tagLine=${encodeURIComponent(tagLine)}`
+            `/api/stats?gameName=${encodeURIComponent(gameName)}` +
+            `&tagLine=${encodeURIComponent(tagLine)}` +
+            `&mode=${encodeURIComponent(mode)}`
         );
 
         if (!response.ok) {
@@ -177,6 +244,31 @@ async function loadStats() {
 
         document.getElementById("winrate").textContent =
             `${data.winrate}%`;
+
+        const historySection =
+        document.getElementById("history-section");
+
+        const historyContainer =
+            document.getElementById("placement-history");
+
+        if (mode === "solo") {
+            historyContainer.replaceChildren();
+
+            (data.placements || []).forEach(placement => {
+                const tile = document.createElement("div");
+
+                tile.className = `placement p${placement}`;
+                tile.textContent = placement;
+
+                tile.title = `Placement: ${placement}`;
+
+                historyContainer.appendChild(tile);
+            });
+
+            historySection.style.display = "block";
+        } else {
+            historySection.style.display = "none";
+        }
 
         // document.getElementById("top2-rate").textContent =
         //     `${data.top2_rate}%`;
